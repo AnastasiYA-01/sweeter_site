@@ -8,59 +8,202 @@
   </head>
   <body>
     <header>
-      <div class="logo">🍰 Sweeter</div>
+      <div class="logo" onclick="location.href = 'index.html'">🍰 Sweeter</div>
       <nav>
         <a href="index.html">Главная</a>
         <a href="catalog.html">Каталог</a>
         <a href="order.html">Заказ</a>
         <a href="chat.html">Чат</a>
+        <div class="cart-icon" onclick="toggleCart()">
+          🛒 <span id="cart-count" class="cart-count">0</span>
+        </div>
       </nav>
     </header>
 
+    <!-- Модальное окно корзины -->
+    <div id="cart-modal" class="cart-modal">
+      <h3>🛒 Корзина</h3>
+      <div id="cart-items" class="cart-items">Корзина пуста</div>
+      <div style="margin-top: 10px; font-weight: bold">
+        Итого: <span id="cart-total">0</span> ₽
+      </div>
+      <button
+        class="btn"
+        style="width: 100%; margin-top: 15px"
+        onclick="location.href = 'order.html'"
+      >
+        Оформить заказ
+      </button>
+    </div>
+
     <main>
       <div class="order-form">
-        <h2>Оформление заказа</h2>
+        <h2>📋 Оформление заказа</h2>
+
+        <!-- Список товаров из корзины -->
         <div class="form-group">
-          <label>Ваше имя</label>
-          <input type="text" id="name" placeholder="Геннадий" />
+          <label>🍰 Ваши товары</label>
+          <div
+            id="order-cart-items"
+            style="
+              border: 1px solid #e0e0e0;
+              padding: 15px;
+              border-radius: 16px;
+              background: #f9f9f9;
+            "
+          ></div>
         </div>
+
+        <!-- Форма для данных клиента -->
         <div class="form-group">
-          <label>Телефон</label>
+          <label>👤 Ваше имя</label>
+          <input
+            type="text"
+            id="name"
+            placeholder="Анастасия"
+            value="Геннадий"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>📞 Телефон</label>
           <input type="tel" id="phone" placeholder="+7 (___) ___-__-__" />
         </div>
+
         <div class="form-group">
-          <label>Адрес доставки</label>
+          <label>🏠 Адрес доставки</label>
           <input type="text" id="address" placeholder="Улица, дом, квартира" />
         </div>
+
         <div class="form-group">
-          <label>Выберите товар</label>
-          <select id="product">
-            <option value="Медовик 1200₽">Медовик — 1200 ₽</option>
-            <option value="Наполеон 1300₽">Наполеон — 1300 ₽</option>
-            <option value="Красный бархат 1500₽">
-              Красный бархат — 1500 ₽
-            </option>
-            <option value="Чизкейк 1400₽">Чизкейк — 1400 ₽</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Комментарий к заказу</label>
+          <label>💬 Комментарий к заказу</label>
           <textarea
             rows="3"
             id="comment"
             placeholder="Пожелания, аллергии, время доставки..."
           ></textarea>
         </div>
+
         <button class="btn" style="width: 100%" onclick="submitOrder()">
-          Подтвердить заказ
+          ✅ Подтвердить заказ
         </button>
       </div>
     </main>
 
     <footer>
       <p>© 2026 Sweeter — Вкусные моменты с доставкой</p>
+      <p>📞 +7 (***) ***-**-** | 📧 ***@sweeter.ru</p>
+      <p>📱 VK (скоро) | 💬 Telegram (скоро)</p>
+      <p style="margin-top: 10px">
+        <a href="admin.html" class="admin-link">👤 администратор</a>
+      </p>
     </footer>
 
     <script src="main.js"></script>
+    <script>
+      // Отображение корзины на странице заказа
+      function updateOrderCartDisplay() {
+        const container = document.getElementById("order-cart-items");
+        if (!container) return;
+
+        const cart = getCart();
+
+        if (cart.length === 0) {
+          container.innerHTML =
+            '<p style="color: #999;">Корзина пуста. Вернитесь в <a href="catalog.html" style="color: #FF9F8C;">каталог</a>, чтобы добавить товары.</p>';
+          return;
+        }
+
+        const total = cart.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0,
+        );
+
+        container.innerHTML = `
+                <div style="margin-bottom: 10px;">
+                    ${cart
+                      .map(
+                        (item) => `
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                            <span>🍰 ${item.name} x${item.quantity}</span>
+                            <span style="font-weight: bold;">${item.price * item.quantity} ₽</span>
+                        </div>
+                    `,
+                      )
+                      .join("")}
+                </div>
+                <div style="margin-top: 12px; padding-top: 10px; border-top: 2px solid #FF9F8C; font-weight: bold; display: flex; justify-content: space-between;">
+                    <span>Итого:</span>
+                    <span>${total} ₽</span>
+                </div>
+            `;
+      }
+
+      // Переопределяем submitOrder из main.js, чтобы он брал корзину
+      window.submitOrder = function () {
+        const name = document.getElementById("name")?.value.trim();
+        const phone = document.getElementById("phone")?.value.trim();
+        const address = document.getElementById("address")?.value.trim();
+        const comment = document.getElementById("comment")?.value;
+
+        if (!name || !phone || !address) {
+          showNotification("Заполните все поля!", "error");
+          return;
+        }
+
+        const cart = getCart();
+
+        if (cart.length === 0) {
+          showNotification("Корзина пуста! Добавьте товары.", "error");
+          return;
+        }
+
+        const order = {
+          id: Date.now(),
+          date: new Date().toLocaleString(),
+          name: name,
+          phone: phone,
+          address: address,
+          comment: comment || "",
+          items: cart,
+          total: cart.reduce((s, i) => s + i.price * i.quantity, 0),
+          status: "Новый",
+        };
+
+        const orders = JSON.parse(
+          localStorage.getItem("sweeter_orders") || "[]",
+        );
+        orders.push(order);
+        localStorage.setItem("sweeter_orders", JSON.stringify(orders));
+
+        // Очищаем корзину
+        localStorage.removeItem("sweeter_cart");
+        updateCartUI();
+
+        showNotification(
+          `✅ Заказ оформлен, ${name}! Сумма: ${order.total} ₽`,
+          "success",
+        );
+
+        // Перенаправляем на главную через 2 секунды
+        setTimeout(() => {
+          location.href = "index.html";
+        }, 2000);
+      };
+
+      // Обновляем отображение при загрузке страницы и при изменении корзины
+      document.addEventListener("DOMContentLoaded", function () {
+        updateCartUI();
+        updateOrderCartDisplay();
+      });
+
+      // Слушаем изменения корзины (если пользователь вернулся из каталога)
+      window.addEventListener("storage", function (e) {
+        if (e.key === "sweeter_cart") {
+          updateCartUI();
+          updateOrderCartDisplay();
+        }
+      });
+    </script>
   </body>
 </html>

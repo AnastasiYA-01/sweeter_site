@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sweeter — Карточка товара</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="logo" onclick="location.href = 'index.html'">🍰 Sweeter</div>
+      <nav>
+        <a href="index.html">Главная</a>
+        <a href="catalog.html">Каталог</a>
+        <a href="order.html">Заказ</a>
+        <a href="chat.html">Чат</a>
+        <div class="cart-icon" onclick="toggleCart()">
+          🛒 <span id="cart-count" class="cart-count">0</span>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Модальное окно корзины -->
+    <div id="cart-modal" class="cart-modal">
+      <h3>🛒 Корзина</h3>
+      <div id="cart-items" class="cart-items">Корзина пуста</div>
+      <div style="margin-top: 10px; font-weight: bold">
+        Итого: <span id="cart-total">0</span> ₽
+      </div>
+      <button
+        class="btn"
+        style="width: 100%; margin-top: 15px"
+        onclick="location.href = 'order.html'"
+      >
+        Оформить заказ
+      </button>
+    </div>
+
+    <main>
+      <div
+        class="product-container"
+        style="max-width: 1200px; margin: 40px auto; padding: 0 20px"
+      >
+        <!-- Хлебные крошки -->
+        <div style="margin-bottom: 30px; color: #999">
+          <a href="index.html" style="color: #999; text-decoration: none"
+            >Главная</a
+          >
+          /
+          <a href="catalog.html" style="color: #999; text-decoration: none"
+            >Каталог</a
+          >
+          /
+          <span style="color: #ff9f8c">Медовик</span>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            background: white;
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+          "
+        >
+          <!-- Фото товара -->
+          <div style="flex: 1; min-width: 280px">
+            <img
+              src="https://via.placeholder.com/500x400?text=Медовик"
+              alt="Медовик"
+              style="width: 100%; border-radius: 24px; object-fit: cover"
+            />
+          </div>
+
+          <!-- Информация о товаре -->
+          <div style="flex: 1; min-width: 280px">
+            <h1 style="font-size: 36px; margin-bottom: 15px; color: #4a4a4a">
+              Медовик
+            </h1>
+
+            <div style="margin-bottom: 20px">
+              <span class="review-stars" style="color: #ffd700">★★★★★</span>
+              <span style="color: #999; margin-left: 10px">15 отзывов</span>
+            </div>
+
+            <div class="price" style="font-size: 32px; margin-bottom: 20px">
+              1 200 ₽
+            </div>
+
+            <div style="margin-bottom: 20px">
+              <div style="display: flex; gap: 20px; margin-bottom: 15px">
+                <span
+                  style="
+                    background: #fff0eb;
+                    padding: 5px 12px;
+                    border-radius: 30px;
+                  "
+                  >🍯 Мёд</span
+                >
+                <span
+                  style="
+                    background: #fff0eb;
+                    padding: 5px 12px;
+                    border-radius: 30px;
+                  "
+                  >🥛 Сметанный крем</span
+                >
+                <span
+                  style="
+                    background: #fff0eb;
+                    padding: 5px 12px;
+                    border-radius: 30px;
+                  "
+                  >🍰 6 коржей</span
+                >
+              </div>
+            </div>
+
+            <div style="margin-bottom: 25px">
+              <h3 style="margin-bottom: 10px">📖 Описание</h3>
+              <p style="color: #666; line-height: 1.6">
+                Нежный, сочный медовик с классическим сметанным кремом. 6 тонких
+                коржей, пропитанных мёдом и сливками. Вес — 1.2 кг. Идеальный
+                выбор для семейного чаепития!
+              </p>
+            </div>
+
+            <div style="margin-bottom: 25px">
+              <h3 style="margin-bottom: 10px">📋 Состав</h3>
+              <p style="color: #666">
+                Мука, мёд, яйца, сахар, сметана, сливочное масло. Натуральные
+                ингредиенты без консервантов.
+              </p>
+            </div>
+
+            <!-- Счётчик и кнопка -->
+            <div style="margin-top: 30px">
+              <div
+                class="quantity-control"
+                style="justify-content: flex-start; margin-bottom: 15px"
+              >
+                <button
+                  class="quantity-btn"
+                  onclick="changeQuantity('Медовик', -1)"
+                >
+                  -
+                </button>
+                <span
+                  class="quantity-value"
+                  id="qty-Медовик"
+                  style="min-width: 40px"
+                  >1</span
+                >
+                <button
+                  class="quantity-btn"
+                  onclick="changeQuantity('Медовик', 1)"
+                >
+                  +
+                </button>
+              </div>
+              <button
+                class="btn"
+                style="padding: 14px 40px; font-size: 18px"
+                onclick="addCurrentQuantityToCart('Медовик', 1200)"
+              >
+                🛒 В корзину
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Блок "Вам может понравиться" -->
+        <div style="margin-top: 60px">
+          <h2 style="text-align: center; margin-bottom: 30px">
+            ✨ Вам может понравиться
+          </h2>
+          <div class="product-grid" id="related-grid"></div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>© 2026 Sweeter — Вкусные моменты с доставкой</p>
+      <p>📞 +7 (***) ***-**-** | 📧 ***@sweeter.ru</p>
+      <p>📱 VK (скоро) | 💬 Telegram (скоро)</p>
+      <p style="margin-top: 10px">
+        <a href="admin.html" class="admin-link">👤 администратор</a>
+      </p>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+      // Загружаем похожие товары (все кроме текущего)
+      function loadRelatedProducts() {
+        const container = document.getElementById("related-grid");
+        if (!container) return;
+
+        const currentProductName = "Медовик";
+        const relatedProducts = products
+          .filter((p) => p.name !== currentProductName)
+          .slice(0, 3);
+
+        container.innerHTML = relatedProducts
+          .map((p) => {
+            const key = p.name.replace(/\s/g, "");
+            return `
+                    <div class="product-card">
+                        <img src="${p.image}" alt="${p.name}" style="cursor: pointer;" onclick="location.href='product.html?name=${encodeURIComponent(p.name)}'">
+                        <h3>${p.name}</h3>
+                        <div class="price">${p.price} ₽</div>
+                        <div class="quantity-control">
+                            <button class="quantity-btn" onclick="changeQuantity('${p.name}', -1)">-</button>
+                            <span class="quantity-value" id="qty-related-${key}">1</span>
+                            <button class="quantity-btn" onclick="changeQuantity('${p.name}', 1)">+</button>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addCurrentQuantityToCartRelated('${p.name}', ${p.price}, '${key}')">🛒 В корзину</button>
+                    </div>
+                `;
+          })
+          .join("");
+      }
+
+      // Для похожих товаров
+      window.addCurrentQuantityToCartRelated = function (
+        productName,
+        price,
+        key,
+      ) {
+        const quantitySpan = document.getElementById(`qty-related-${key}`);
+        let quantity = 1;
+        if (quantitySpan) {
+          quantity = parseInt(quantitySpan.textContent) || 1;
+        }
+        addToCart(productName, price, quantity);
+        // Сбрасываем счётчик
+        if (quantitySpan) quantitySpan.textContent = "1";
+      };
+
+      document.addEventListener("DOMContentLoaded", function () {
+        updateCartUI();
+        loadRelatedProducts();
+      });
+    </script>
+  </body>
+</html>

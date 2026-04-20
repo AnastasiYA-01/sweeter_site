@@ -3,19 +3,38 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sweeter — Чат</title>
+    <title>Sweeter — Чат с кондитером</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <header>
-      <div class="logo">🍰 Sweeter</div>
+      <div class="logo" onclick="location.href = 'index.html'">🍰 Sweeter</div>
       <nav>
         <a href="index.html">Главная</a>
         <a href="catalog.html">Каталог</a>
         <a href="order.html">Заказ</a>
         <a href="chat.html">Чат</a>
+        <div class="cart-icon" onclick="toggleCart()">
+          🛒 <span id="cart-count" class="cart-count">0</span>
+        </div>
       </nav>
     </header>
+
+    <!-- Модальное окно корзины -->
+    <div id="cart-modal" class="cart-modal">
+      <h3>🛒 Корзина</h3>
+      <div id="cart-items" class="cart-items">Корзина пуста</div>
+      <div style="margin-top: 10px; font-weight: bold">
+        Итого: <span id="cart-total">0</span> ₽
+      </div>
+      <button
+        class="btn"
+        style="width: 100%; margin-top: 15px"
+        onclick="location.href = 'order.html'"
+      >
+        Оформить заказ
+      </button>
+    </div>
 
     <main>
       <div class="chat-container">
@@ -27,26 +46,47 @@
           </div>
         </div>
         <div class="chat-messages" id="chat-messages">
-          <div class="message baker">Добро пожаловать! Чем могу помочь? 🍰</div>
+          <div class="message baker">🍰 Добро пожаловать! Чем могу помочь?</div>
+          <div class="message baker">
+            Можете спросить про цены, доставку, состав или аллергены!
+          </div>
         </div>
         <div class="chat-quick">
           <button
             class="quick-btn"
+            onclick="sendQuickMessage('Сколько стоят торты?')"
+          >
+            💰 Цены
+          </button>
+          <button
+            class="quick-btn"
+            onclick="sendQuickMessage('Какая доставка?')"
+          >
+            🚚 Доставка
+          </button>
+          <button
+            class="quick-btn"
+            onclick="sendQuickMessage('Состав десертов?')"
+          >
+            📜 Состав
+          </button>
+          <button
+            class="quick-btn"
             onclick="sendQuickMessage('Можно без сахара?')"
           >
-            Можно без сахара?
+            🍬 Без сахара
           </button>
           <button
             class="quick-btn"
-            onclick="sendQuickMessage('Доставка за город?')"
+            onclick="sendQuickMessage('Аллергия на орехи')"
           >
-            Доставка за город?
+            🥜 Аллергия
           </button>
           <button
             class="quick-btn"
-            onclick="sendQuickMessage('Скидка на первый заказ?')"
+            onclick="sendQuickMessage('Можно заказать на завтра?')"
           >
-            Скидка на первый заказ?
+            📅 На завтра
           </button>
         </div>
         <div class="chat-input">
@@ -56,13 +96,18 @@
             placeholder="Напишите сообщение..."
             onkeypress="if (event.key === 'Enter') sendMessage();"
           />
-          <button class="btn" onclick="sendMessage()">📤</button>
+          <button class="btn" onclick="sendMessage()">📤 Отправить</button>
         </div>
       </div>
     </main>
 
     <footer>
       <p>© 2026 Sweeter — Вкусные моменты с доставкой</p>
+      <p>📞 +7 (***) ***-**-** | 📧 ***@sweeter.ru</p>
+      <p>📱 VK (скоро) | 💬 Telegram (скоро)</p>
+      <p style="margin-top: 10px">
+        <a href="admin.html" class="admin-link">👤 администратор</a>
+      </p>
     </footer>
 
     <script src="main.js"></script>

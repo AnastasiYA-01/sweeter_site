@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sweeter — Админ-панель</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .login-container {
+        max-width: 400px;
+        margin: 100px auto;
+        background: white;
+        padding: 40px;
+        border-radius: 30px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+      .login-container input {
+        width: 100%;
+        padding: 12px;
+        margin: 15px 0;
+        border-radius: 30px;
+        border: 1px solid #ddd;
+        font-size: 16px;
+      }
+      .admin-container {
+        max-width: 1400px;
+        margin: 40px auto;
+        padding: 20px;
+        display: none;
+      }
+      .order-card,
+      .review-card-admin {
+        background: white;
+        border-radius: 24px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border-left: 5px solid #ff9f8c;
+      }
+      .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+      }
+      .order-id {
+        font-weight: bold;
+        color: #ff9f8c;
+      }
+      .order-date {
+        color: #666;
+        font-size: 14px;
+      }
+      .order-status {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+      }
+      .status-new {
+        background: #ffe0e0;
+        color: #ff6b6b;
+      }
+      .status-cooking {
+        background: #fff0db;
+        color: #ff9f8c;
+      }
+      .status-delivery {
+        background: #e0f0ff;
+        color: #4a90e2;
+      }
+      .status-done {
+        background: #e0ffe0;
+        color: #4caf50;
+      }
+      .order-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 12px;
+        margin-top: 15px;
+      }
+      .detail-item {
+        font-size: 14px;
+      }
+      .detail-label {
+        font-weight: bold;
+        color: #666;
+      }
+      .items-list {
+        background: #fff5f0;
+        padding: 12px;
+        border-radius: 16px;
+        margin-top: 12px;
+      }
+      select.status-select {
+        padding: 5px 12px;
+        border-radius: 20px;
+        border: 1px solid #ddd;
+        background: white;
+        cursor: pointer;
+      }
+      .filters {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+      }
+      .filter-btn {
+        background: white;
+        border: 1px solid #ff9f8c;
+        padding: 8px 20px;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .filter-btn.active {
+        background: #ff9f8c;
+        color: white;
+      }
+      .delete-btn {
+        background: none;
+        border: none;
+        color: #ff6b6b;
+        cursor: pointer;
+        font-size: 20px;
+        margin-left: 10px;
+      }
+      .tabs {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+      }
+      .tab {
+        cursor: pointer;
+        padding: 10px 25px;
+        border-radius: 30px;
+        transition: all 0.2s;
+      }
+      .tab.active {
+        background: #ff9f8c;
+        color: white;
+      }
+      .review-card-admin {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+      .review-content {
+        flex: 1;
+      }
+      .review-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .approve-btn {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 30px;
+        cursor: pointer;
+      }
+      .reject-btn {
+        background: #ff6b6b;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 30px;
+        cursor: pointer;
+      }
+      .review-stars {
+        color: #ffd700;
+        letter-spacing: 2px;
+        margin: 5px 0;
+      }
+      .empty-state {
+        text-align: center;
+        padding: 60px;
+        color: #999;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo" onclick="location.href = 'index.html'">🍰 Sweeter</div>
+      <nav>
+        <a href="index.html">Главная</a>
+        <a href="catalog.html">Каталог</a>
+        <a href="order.html">Заказ</a>
+        <a href="chat.html">Чат</a>
+        <div class="cart-icon" onclick="toggleCart()">
+          🛒 <span id="cart-count" class="cart-count">0</span>
+        </div>
+      </nav>
+    </header>
+
+    <div id="cart-modal" class="cart-modal">
+      <h3>Корзина</h3>
+      <div id="cart-items" class="cart-items">Корзина пуста</div>
+      <div>Итого: <span id="cart-total">0</span> ₽</div>
+      <button
+        class="btn"
+        style="width: 100%; margin-top: 15px"
+        onclick="location.href = 'order.html'"
+      >
+        Оформить заказ
+      </button>
+    </div>
+
+    <main>
+      <!-- Форма входа -->
+      <div id="login-container" class="login-container">
+        <h2>🔐 Панель администратора</h2>
+        <p style="color: #999; margin-bottom: 20px">Введите пароль для входа</p>
+        <input type="password" id="password-input" placeholder="Пароль" />
+        <button class="btn" onclick="checkPassword()">Войти</button>
+      </div>
+
+      <!-- Админ-панель (скрыта до входа) -->
+      <div id="admin-container" class="admin-container">
+        <h1>📋 Панель управления</h1>
+
+        <div class="tabs">
+          <div class="tab active" onclick="showTab('orders')">📦 Заказы</div>
+          <div class="tab" onclick="showTab('reviews')">
+            💬 Отзывы (на модерации)
+          </div>
+        </div>
+
+        <!-- Вкладка Заказы -->
+        <div id="orders-tab">
+          <div class="filters">
+            <button
+              class="filter-btn active"
+              data-filter="all"
+              onclick="filterOrders('all')"
+            >
+              Все
+            </button>
+            <button
+              class="filter-btn"
+              data-filter="Новый"
+              onclick="filterOrders('Новый')"
+            >
+              🆕 Новые
+            </button>
+            <button
+              class="filter-btn"
+              data-filter="Готовится"
+              onclick="filterOrders('Готовится')"
+            >
+              👩‍🍳 Готовится
+            </button>
+            <button
+              class="filter-btn"
+              data-filter="Доставляется"
+              onclick="filterOrders('Доставляется')"
+            >
+              🚚 Доставляется
+            </button>
+            <button
+              class="filter-btn"
+              data-filter="Выполнен"
+              onclick="filterOrders('Выполнен')"
+            >
+              ✅ Выполнены
+            </button>
+          </div>
+          <div id="orders-container"></div>
+        </div>
+
+        <!-- Вкладка Отзывы на модерации -->
+        <div id="reviews-tab" style="display: none">
+          <div id="pending-reviews-container"></div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>© 2026 Sweeter — Вкусные моменты с доставкой</p>
+      <p>📞 +7 (***) ***-**-** | 📧 ***@sweeter.ru</p>
+      <p>📱 VK (скоро) | 💬 Telegram (скоро)</p>
+      <p style="margin-top: 10px">
+        <a href="admin.html" class="admin-link">👤 администратор</a>
+      </p>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+      const ADMIN_PASSWORD = "свитер";
+      let currentFilter = "all";
+
+      // === ВХОД ПО ПАРОЛЮ ===
+      function checkPassword() {
+        const input = document.getElementById("password-input").value;
+        if (input === ADMIN_PASSWORD) {
+          document.getElementById("login-container").style.display = "none";
+          document.getElementById("admin-container").style.display = "block";
+          loadOrders();
+          loadPendingReviews();
+          showNotification("Добро пожаловать в админ-панель!", "success");
+        } else {
+          showNotification("Неверный пароль!", "error");
+        }
+      }
+
+      // === ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ===
+      function showTab(tab) {
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) => t.classList.remove("active"));
+        event.target.classList.add("active");
+
+        if (tab === "orders") {
+          document.getElementById("orders-tab").style.display = "block";
+          document.getElementById("reviews-tab").style.display = "none";
+          loadOrders();
+        } else {
+          document.getElementById("orders-tab").style.display = "none";
+          document.getElementById("reviews-tab").style.display = "block";
+          loadPendingReviews();
+        }
+      }
+
+      // === ЗАГРУЗКА ЗАКАЗОВ ===
+      function loadOrders() {
+        const orders = JSON.parse(
+          localStorage.getItem("sweeter_orders") || "[]",
+        );
+        let filteredOrders = orders;
+
+        if (currentFilter !== "all") {
+          filteredOrders = orders.filter((o) => o.status === currentFilter);
+        }
+
+        filteredOrders.sort((a, b) => b.id - a.id);
+
+        const container = document.getElementById("orders-container");
+
+        if (filteredOrders.length === 0) {
+          container.innerHTML = '<div class="empty-state">📭 Нет заказов</div>';
+          return;
+        }
+
+        container.innerHTML = filteredOrders
+          .map(
+            (order) => `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div>
+                            <span class="order-id">Заказ #${order.id}</span>
+                            <span class="order-date"> | ${order.date}</span>
+                        </div>
+                        <div>
+                            <select class="status-select" onchange="updateStatus(${order.id}, this.value)">
+                                <option value="Новый" ${order.status === "Новый" ? "selected" : ""}>🆕 Новый</option>
+                                <option value="Готовится" ${order.status === "Готовится" ? "selected" : ""}>👩‍🍳 Готовится</option>
+                                <option value="Доставляется" ${order.status === "Доставляется" ? "selected" : ""}>🚚 Доставляется</option>
+                                <option value="Выполнен" ${order.status === "Выполнен" ? "selected" : ""}>✅ Выполнен</option>
+                            </select>
+                            <button class="delete-btn" onclick="deleteOrder(${order.id})">🗑️</button>
+                        </div>
+                    </div>
+                    
+                    <div class="order-details">
+                        <div class="detail-item"><span class="detail-label">👤 Имя:</span> ${escapeHtml(order.name)}</div>
+                        <div class="detail-item"><span class="detail-label">📞 Телефон:</span> ${escapeHtml(order.phone)}</div>
+                        <div class="detail-item"><span class="detail-label">🏠 Адрес:</span> ${escapeHtml(order.address)}</div>
+                        <div class="detail-item"><span class="detail-label">💰 Сумма:</span> ${order.total} ₽</div>
+                        <div class="detail-item"><span class="detail-label">💬 Комментарий:</span> ${order.comment || "—"}</div>
+                    </div>
+                    
+                    <div class="items-list">
+                        <strong>🍰 Состав заказа:</strong><br>
+                        ${order.items.map((item) => `${item.name} x${item.quantity} = ${item.price * item.quantity} ₽`).join("<br>")}
+                    </div>
+                </div>
+            `,
+          )
+          .join("");
+      }
+
+      function updateStatus(orderId, newStatus) {
+        const orders = JSON.parse(
+          localStorage.getItem("sweeter_orders") || "[]",
+        );
+        const order = orders.find((o) => o.id == orderId);
+        if (order) {
+          order.status = newStatus;
+          localStorage.setItem("sweeter_orders", JSON.stringify(orders));
+          loadOrders();
+          showNotification(
+            `Статус заказа #${orderId} изменён на «${newStatus}»`,
+            "success",
+          );
+        }
+      }
+
+      function deleteOrder(orderId) {
+        if (confirm("Удалить заказ?")) {
+          let orders = JSON.parse(
+            localStorage.getItem("sweeter_orders") || "[]",
+          );
+          orders = orders.filter((o) => o.id != orderId);
+          localStorage.setItem("sweeter_orders", JSON.stringify(orders));
+          loadOrders();
+          showNotification(`Заказ #${orderId} удалён`, "info");
+        }
+      }
+
+      // === ФИЛЬТРАЦИЯ ЗАКАЗОВ ===
+      function filterOrders(filter) {
+        currentFilter = filter;
+        document.querySelectorAll(".filter-btn").forEach((btn) => {
+          if (
+            btn.dataset.filter === filter ||
+            (filter === "all" && btn.dataset.filter === "all")
+          ) {
+            btn.classList.add("active");
+          } else {
+            btn.classList.remove("active");
+          }
+        });
+        loadOrders();
+      }
+
+      // === ОТЗЫВЫ НА МОДЕРАЦИИ ===
+      function loadPendingReviews() {
+        const pendingReviews = JSON.parse(
+          localStorage.getItem("sweeter_pending_reviews") || "[]",
+        );
+        const container = document.getElementById("pending-reviews-container");
+
+        if (pendingReviews.length === 0) {
+          container.innerHTML =
+            '<div class="empty-state">💬 Нет отзывов на модерации</div>';
+          return;
+        }
+
+        container.innerHTML = pendingReviews
+          .map(
+            (review) => `
+                <div class="review-card-admin">
+                    <div class="review-content">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <div style="width: 40px; height: 40px; background: #FF9F8C; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">${getAvatar(review.author)}</div>
+                            <div>
+                                <strong>${escapeHtml(review.author)}</strong>
+                                <div class="review-stars">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</div>
+                            </div>
+                        </div>
+                        <div class="review-text" style="margin-bottom: 10px;">«${escapeHtml(review.text)}»</div>
+                        <div style="font-size: 12px; color: #999;">${review.date}</div>
+                    </div>
+                    <div class="review-actions">
+                        <button class="approve-btn" onclick="approveReview(${review.id})">✅ Опубликовать</button>
+                        <button class="reject-btn" onclick="rejectReview(${review.id})">❌ Удалить</button>
+                    </div>
+                </div>
+            `,
+          )
+          .join("");
+      }
+
+      function approveReview(reviewId) {
+        let pendingReviews = JSON.parse(
+          localStorage.getItem("sweeter_pending_reviews") || "[]",
+        );
+        const review = pendingReviews.find((r) => r.id === reviewId);
+
+        if (review) {
+          // Удаляем из ожидающих
+          pendingReviews = pendingReviews.filter((r) => r.id !== reviewId);
+          localStorage.setItem(
+            "sweeter_pending_reviews",
+            JSON.stringify(pendingReviews),
+          );
+
+          // Добавляем в опубликованные
+          const publishedReviews = JSON.parse(
+            localStorage.getItem("sweeter_published_reviews") || "[]",
+          );
+          review.status = "published";
+          publishedReviews.push(review);
+          localStorage.setItem(
+            "sweeter_published_reviews",
+            JSON.stringify(publishedReviews),
+          );
+
+          loadPendingReviews();
+          showNotification("Отзыв опубликован!", "success");
+        }
+      }
+
+      function rejectReview(reviewId) {
+        if (confirm("Удалить этот отзыв без публикации?")) {
+          let pendingReviews = JSON.parse(
+            localStorage.getItem("sweeter_pending_reviews") || "[]",
+          );
+          pendingReviews = pendingReviews.filter((r) => r.id !== reviewId);
+          localStorage.setItem(
+            "sweeter_pending_reviews",
+            JSON.stringify(pendingReviews),
+          );
+          loadPendingReviews();
+          showNotification("Отзыв удалён", "info");
+        }
+      }
+
+      function getAvatar(name) {
+        return name.charAt(0).toUpperCase();
+      }
+
+      function escapeHtml(str) {
+        if (!str) return "";
+        return str.replace(/[&<>]/g, function (m) {
+          if (m === "&") return "&amp;";
+          if (m === "<") return "&lt;";
+          if (m === ">") return "&gt;";
+          return m;
+        });
+      }
+
+      // === КОРЗИНА (для отображения в админке) ===
+      document.addEventListener("DOMContentLoaded", function () {
+        updateCartUI();
+      });
+    </script>
+  </body>
+</html>

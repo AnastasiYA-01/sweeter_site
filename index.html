@@ -8,41 +8,143 @@
   </head>
   <body>
     <header>
-      <div class="logo">🍰 Sweeter</div>
+      <div class="logo" onclick="location.href = 'index.html'">🍰 Sweeter</div>
       <nav>
         <a href="index.html">Главная</a>
         <a href="catalog.html">Каталог</a>
         <a href="order.html">Заказ</a>
         <a href="chat.html">Чат</a>
+        <div class="cart-icon" onclick="toggleCart()">
+          🛒 <span id="cart-count" class="cart-count">0</span>
+        </div>
       </nav>
     </header>
 
+    <!-- Модальное окно корзины -->
+    <div id="cart-modal" class="cart-modal">
+      <h3>🛒 Корзина</h3>
+      <div id="cart-items" class="cart-items">Корзина пуста</div>
+      <div style="margin-top: 10px; font-weight: bold">
+        Итого: <span id="cart-total">0</span> ₽
+      </div>
+      <button
+        class="btn"
+        style="width: 100%; margin-top: 15px"
+        onclick="location.href = 'order.html'"
+      >
+        Оформить заказ
+      </button>
+    </div>
+
     <main>
+      <!-- Герой-блок -->
       <section class="hero">
         <h1>Сладкие моменты<br />с доставкой на дом</h1>
         <p>Авторские десерты от лучших кондитеров города</p>
         <a href="catalog.html" class="btn hero-btn">Смотреть каталог</a>
       </section>
 
+      <!-- Категории -->
       <section class="categories">
-        <h2>Выбери свой десерт</h2>
+        <h2>🍬 Выбери свой десерт</h2>
         <div class="category-grid">
-          <div class="category">🍰 Торты</div>
-          <div class="category">🧁 Пирожные</div>
-          <div class="category">🍪 Печенье</div>
-          <div class="category">🎂 Капкейки</div>
+          <div class="category" onclick="filterCategory('Торты')">🍰 Торты</div>
+          <div class="category" onclick="filterCategory('Пирожные')">
+            🧁 Пирожные
+          </div>
+          <div class="category" onclick="filterCategory('Печенье')">
+            🍪 Печенье
+          </div>
+          <div class="category" onclick="filterCategory('Капкейки')">
+            🎂 Капкейки
+          </div>
         </div>
       </section>
 
+      <!-- Популярные товары -->
       <section class="popular">
         <h2>⭐ Популярное</h2>
         <div class="product-grid" id="popular-grid"></div>
+      </section>
+
+      <!-- Отзывы -->
+      <section class="reviews">
+        <h2>💬 Отзывы наших клиентов</h2>
+        <div class="reviews-grid" id="reviews-grid"></div>
+
+        <!-- Форма добавления отзыва -->
+        <div
+          style="
+            text-align: center;
+            margin-top: 40px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+          "
+        >
+          <h3>✨ Оставить отзыв</h3>
+          <textarea
+            id="review-text"
+            rows="2"
+            placeholder="Ваш отзыв..."
+            style="
+              width: 100%;
+              padding: 12px;
+              border-radius: 16px;
+              border: 1px solid #ddd;
+              margin-bottom: 10px;
+              font-family: inherit;
+            "
+          ></textarea>
+          <input
+            type="text"
+            id="review-author"
+            placeholder="Ваше имя"
+            style="
+              width: 100%;
+              padding: 12px;
+              border-radius: 16px;
+              border: 1px solid #ddd;
+              margin-bottom: 10px;
+            "
+          />
+          <select
+            id="review-rating"
+            style="
+              width: 100%;
+              padding: 12px;
+              border-radius: 16px;
+              border: 1px solid #ddd;
+              margin-bottom: 10px;
+            "
+          >
+            <option value="5">★★★★★ 5</option>
+            <option value="4">★★★★☆ 4</option>
+            <option value="3">★★★☆☆ 3</option>
+            <option value="2">★★☆☆☆ 2</option>
+            <option value="1">★☆☆☆☆ 1</option>
+          </select>
+          <button class="btn" onclick="submitReview()">
+            📤 Отправить отзыв
+          </button>
+          <p style="font-size: 12px; color: #999; margin-top: 10px">
+            Отзыв будет опубликован после проверки администратором
+          </p>
+        </div>
       </section>
     </main>
 
     <footer>
       <p>© 2026 Sweeter — Вкусные моменты с доставкой</p>
-      <p>📞 +7 (999) ***-**-** | 📧 sweet@***.ru</p>
+      <p>📞 +7 (***) ***-**-** | 📧 ***@sweeter.ru</p>
+      <p>📱 VK (скоро) | 💬 Telegram (скоро)</p>
+      <p style="margin-top: 10px">
+        <a href="admin.html" class="admin-link">👤 администратор</a>
+      </p>
     </footer>
 
     <script src="main.js"></script>

@@ -10,16 +10,17 @@ body {
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
+    Roboto,
     sans-serif;
   background-color: #fff5f0;
   color: #4a4a4a;
   line-height: 1.6;
 }
 
-/* Шапка */
+/* === ШАПКА === */
 header {
   background: white;
-  padding: 20px 40px;
+  padding: 15px 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -32,21 +33,94 @@ header {
 .logo {
   font-size: 28px;
   font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
   color: #ff9f8c;
 }
 
+.logo:hover {
+  transform: scale(1.02);
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
 nav a {
-  margin-left: 30px;
   text-decoration: none;
   color: #4a4a4a;
   transition: color 0.3s;
+  font-weight: 500;
 }
 
 nav a:hover {
   color: #ff9f8c;
 }
 
-/* Герой-блок */
+/* === КОРЗИНА === */
+.cart-icon {
+  position: relative;
+  cursor: pointer;
+  font-size: 24px;
+  margin-left: 20px;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -12px;
+  background: #ff6b6b;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 20px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.cart-modal {
+  display: none;
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  width: 340px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  padding: 20px;
+}
+
+.cart-modal.show {
+  display: block;
+}
+
+.cart-items {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 15px;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.cart-item button {
+  background: none;
+  border: none;
+  color: #ff6b6b;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+/* === ГЕРОЙ-БЛОК === */
 .hero {
   background: linear-gradient(135deg, #ff9f8c, #ffd4c4);
   text-align: center;
@@ -62,6 +136,7 @@ nav a:hover {
 .hero p {
   font-size: 20px;
   margin-bottom: 30px;
+  opacity: 0.95;
 }
 
 .hero-btn {
@@ -71,7 +146,7 @@ nav a:hover {
   padding: 12px 30px;
 }
 
-/* Кнопки */
+/* === КНОПКИ === */
 .btn {
   display: inline-block;
   background: #ff9f8c;
@@ -81,10 +156,9 @@ nav a:hover {
   border-radius: 30px;
   cursor: pointer;
   text-decoration: none;
-  transition:
-    background 0.3s,
-    transform 0.2s;
+  transition: all 0.3s;
   font-size: 16px;
+  font-weight: 500;
 }
 
 .btn:hover {
@@ -92,9 +166,10 @@ nav a:hover {
   transform: translateY(-2px);
 }
 
-/* Категории */
+/* === КАТЕГОРИИ === */
 .categories,
-.popular {
+.popular,
+.reviews {
   padding: 60px 40px;
   max-width: 1200px;
   margin: 0 auto;
@@ -116,22 +191,22 @@ h2 {
 
 .category {
   background: white;
-  padding: 20px 30px;
+  padding: 20px 35px;
   border-radius: 60px;
   font-size: 18px;
-  font-weight: 500;
+  font-weight: 600;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s;
+  transition: all 0.3s;
   cursor: pointer;
 }
 
 .category:hover {
-  transform: translateY(-5px);
   background: #ff9f8c;
   color: white;
+  transform: translateY(-5px);
 }
 
-/* Сетка товаров */
+/* === СЕТКА ТОВАРОВ === */
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -145,19 +220,21 @@ h2 {
   border-radius: 24px;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s;
+  transition: all 0.3s;
   text-align: center;
   padding-bottom: 20px;
 }
 
 .product-card:hover {
   transform: translateY(-8px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
 }
 
 .product-card img {
   width: 100%;
   height: 200px;
   object-fit: cover;
+  background: #f0f0f0;
 }
 
 .product-card h3 {
@@ -172,14 +249,65 @@ h2 {
   margin: 10px 0;
 }
 
-/* Форма заказа */
+/* === СЧЁТЧИК ТОВАРА === */
+.quantity-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin: 10px 0;
+}
+
+.quantity-btn {
+  background: #fff0eb;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quantity-btn:hover {
+  background: #ff9f8c;
+  color: white;
+}
+
+.quantity-value {
+  font-size: 18px;
+  font-weight: bold;
+  min-width: 30px;
+  text-align: center;
+}
+
+.add-to-cart-btn {
+  background: #ff9f8c;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  margin-top: 5px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.add-to-cart-btn:hover {
+  background: #ff7f6b;
+  transform: scale(1.02);
+}
+
+/* === ФОРМА ЗАКАЗА === */
 .order-form {
   max-width: 600px;
   margin: 60px auto;
   background: white;
   padding: 40px;
   border-radius: 30px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
 .order-form h2 {
@@ -205,16 +333,31 @@ h2 {
   border-radius: 16px;
   font-family: inherit;
   font-size: 16px;
+  background: #f9f9f9;
+  transition: border 0.2s;
 }
 
-/* Чат */
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #ff9f8c;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #bbb;
+  font-style: italic;
+}
+
+/* === ЧАТ === */
 .chat-container {
   max-width: 800px;
   margin: 40px auto;
   background: white;
   border-radius: 30px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
 .chat-header {
@@ -241,7 +384,7 @@ h2 {
 }
 
 .chat-messages {
-  height: 400px;
+  height: 350px;
   padding: 20px;
   overflow-y: auto;
   background: #fafafa;
@@ -251,7 +394,7 @@ h2 {
   margin-bottom: 15px;
   padding: 10px 16px;
   border-radius: 20px;
-  max-width: 70%;
+  max-width: 80%;
   word-wrap: break-word;
 }
 
@@ -273,6 +416,7 @@ h2 {
   padding: 15px;
   flex-wrap: wrap;
   border-top: 1px solid #eee;
+  background: white;
 }
 
 .quick-btn {
@@ -281,11 +425,13 @@ h2 {
   padding: 8px 16px;
   border-radius: 30px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
+  transition: all 0.2s;
 }
 
 .quick-btn:hover {
   background: #ffd4c4;
+  transform: scale(1.02);
 }
 
 .chat-input {
@@ -293,6 +439,7 @@ h2 {
   padding: 15px;
   border-top: 1px solid #eee;
   gap: 10px;
+  background: white;
 }
 
 .chat-input input {
@@ -300,9 +447,125 @@ h2 {
   padding: 12px 16px;
   border: 1px solid #ddd;
   border-radius: 30px;
+  font-size: 14px;
 }
 
-/* Подвал */
+.chat-input input:focus {
+  outline: none;
+  border-color: #ff9f8c;
+}
+
+/* === ОТЗЫВЫ (красивые) === */
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 25px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.review-card {
+  background: white;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s;
+}
+
+.review-card:hover {
+  transform: translateY(-4px);
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.review-avatar {
+  width: 48px;
+  height: 48px;
+  background: #ff9f8c;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+}
+
+.review-info {
+  flex: 1;
+}
+
+.review-author {
+  font-weight: bold;
+  color: #4a4a4a;
+}
+
+.review-date {
+  font-size: 11px;
+  color: #999;
+}
+
+.review-stars {
+  color: #ffd700;
+  letter-spacing: 2px;
+  font-size: 14px;
+}
+
+.review-text {
+  color: #4a4a4a;
+  line-height: 1.5;
+  margin-bottom: 15px;
+  font-style: italic;
+}
+
+/* === УВЕДОМЛЕНИЯ === */
+.notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: white;
+  color: #4a4a4a;
+  padding: 12px 24px;
+  border-radius: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 2000;
+  animation: slideIn 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.notification.success {
+  border-left: 4px solid #4caf50;
+}
+
+.notification.error {
+  border-left: 4px solid #ff6b6b;
+}
+
+.notification.info {
+  border-left: 4px solid #ff9f8c;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* === ПОДВАЛ === */
 footer {
   background: #4a4a4a;
   color: white;
@@ -311,30 +574,79 @@ footer {
   margin-top: 60px;
 }
 
+footer p {
+  margin: 5px 0;
+}
+
+.admin-link {
+  color: #aaa;
+  text-decoration: none;
+  font-size: 12px;
+  opacity: 0.6;
+  transition: all 0.2s;
+}
+
+.admin-link:hover {
+  opacity: 1;
+  color: #ff9f8c;
+}
+
+/* === ОБЩИЕ СТРАНИЦЫ === */
 .page-title {
   text-align: center;
-  margin: 40px 0;
+  margin: 40px 0 20px;
   font-size: 36px;
 }
 
-/* Адаптивность */
+/* === АДАПТИВНОСТЬ === */
 @media (max-width: 768px) {
   header {
     flex-direction: column;
     gap: 15px;
+    padding: 15px 20px;
   }
 
-  nav a {
-    margin: 0 15px;
+  nav {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .cart-icon {
+    margin-left: 0;
   }
 
   .hero h1 {
     font-size: 32px;
   }
 
+  .hero p {
+    font-size: 16px;
+  }
+
+  .hero {
+    padding: 60px 20px;
+  }
+
+  .categories,
+  .popular,
+  .reviews {
+    padding: 40px 20px;
+  }
+
+  h2 {
+    font-size: 28px;
+  }
+
+  .category {
+    padding: 12px 24px;
+    font-size: 16px;
+  }
+
   .product-grid {
     grid-template-columns: 1fr;
-    padding: 20px;
+    gap: 20px;
+    padding: 0 15px;
   }
 
   .order-form {
@@ -344,5 +656,24 @@ footer {
 
   .chat-container {
     margin: 20px;
+    border-radius: 20px;
+  }
+
+  .cart-modal {
+    width: 300px;
+    right: 10px;
+    left: auto;
+  }
+
+  .review-card {
+    margin: 0 15px;
+  }
+
+  .reviews-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chat-quick {
+    justify-content: center;
   }
 }
