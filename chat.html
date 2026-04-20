@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sweeter — Чат</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="logo">🍰 Sweeter</div>
+      <nav>
+        <a href="index.html">Главная</a>
+        <a href="catalog.html">Каталог</a>
+        <a href="order.html">Заказ</a>
+        <a href="chat.html">Чат</a>
+      </nav>
+    </header>
+
+    <main>
+      <div class="chat-container">
+        <div class="chat-header">
+          <span class="chat-avatar">👩‍🍳</span>
+          <div>
+            <div class="chat-name">Сладкая сказка</div>
+            <div class="chat-status">онлайн</div>
+          </div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+          <div class="message baker">Добро пожаловать! Чем могу помочь? 🍰</div>
+        </div>
+        <div class="chat-quick">
+          <button
+            class="quick-btn"
+            onclick="sendQuickMessage('Можно без сахара?')"
+          >
+            Можно без сахара?
+          </button>
+          <button
+            class="quick-btn"
+            onclick="sendQuickMessage('Доставка за город?')"
+          >
+            Доставка за город?
+          </button>
+          <button
+            class="quick-btn"
+            onclick="sendQuickMessage('Скидка на первый заказ?')"
+          >
+            Скидка на первый заказ?
+          </button>
+        </div>
+        <div class="chat-input">
+          <input
+            type="text"
+            id="chat-input"
+            placeholder="Напишите сообщение..."
+            onkeypress="if (event.key === 'Enter') sendMessage();"
+          />
+          <button class="btn" onclick="sendMessage()">📤</button>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>© 2026 Sweeter — Вкусные моменты с доставкой</p>
+    </footer>
+
+    <script src="main.js"></script>
+  </body>
+</html>
