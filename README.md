@@ -48,11 +48,3 @@
 - **Хранение:** localStorage (для корзины), API (для пользователей)
 - **Деплой:** GitHub Pages (статическая часть)
 
----
-
-## 🚀 Быстрый старт
-
-### 1. Клонируй репозиторий
-```bash
-git clone https://github.com/AnastasiYA-01/sweeter_site.git
-cd sweeter_site
