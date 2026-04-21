@@ -38,6 +38,27 @@ function requireAuth(action) {
   return true;
 }
 
+// === ОБНОВЛЕНИЕ ШАПКИ ===
+function updateHeader() {
+  const currentUser = getCurrentUser();
+  const profileLink = document.querySelector('nav a[href="profile.html"]');
+  const orderLink = document.querySelector('nav a[href="order.html"]');
+  const chatLink = document.querySelector('nav a[href="chat.html"]');
+
+  if (currentUser) {
+    if (profileLink) profileLink.innerHTML = `👤 ${currentUser.name}`;
+    if (orderLink) orderLink.style.display = "inline-block";
+    if (chatLink) chatLink.style.display = "inline-block";
+  } else {
+    if (profileLink) {
+      profileLink.innerHTML = `👤 Профиль`;
+      profileLink.href = "login.html";
+    }
+    if (orderLink) orderLink.style.display = "none";
+    if (chatLink) chatLink.style.display = "none";
+  }
+}
+
 // === API ЗАПРОСЫ ===
 async function apiRequest(url, method, data) {
   try {
@@ -47,9 +68,7 @@ async function apiRequest(url, method, data) {
       body: data ? JSON.stringify(data) : undefined,
     });
     const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error || "Ошибка запроса");
-    }
+    if (!response.ok) throw new Error(result.error || "Ошибка запроса");
     return result;
   } catch (error) {
     showNotification(error.message, "error");
@@ -124,7 +143,7 @@ const products = [
   },
 ];
 
-// === КОРЗИНА (пока localStorage, но скоро на сервер) ===
+// === КОРЗИНА ===
 function getCart() {
   return JSON.parse(localStorage.getItem("sweeter_cart") || "[]");
 }
@@ -198,7 +217,8 @@ function updateCartUI() {
 }
 
 function toggleCart() {
-  document.getElementById("cart-modal")?.classList.toggle("show");
+  const modal = document.getElementById("cart-modal");
+  if (modal) modal.classList.toggle("show");
 }
 
 function getQuantityFromCart(productName) {
@@ -278,14 +298,17 @@ function loadProducts(containerId, limit = null) {
     .join("");
 }
 
+// === КАТЕГОРИИ ===
 function filterCategory(category) {
   const filtered = products.filter((p) => p.category === category);
-  if (filtered.length)
+  if (filtered.length) {
     showNotification(
       `🍰 В категории «${category}»: ${filtered.map((p) => p.name).join(", ")}`,
       "info",
     );
-  else showNotification(`В категории «${category}» пока нет товаров`, "error");
+  } else {
+    showNotification(`В категории «${category}» пока нет товаров`, "error");
+  }
 }
 
 // === ОТЗЫВЫ ===
@@ -322,11 +345,13 @@ async function loadPublishedReviews() {
     const reviews = await apiRequest("/reviews/published", "GET");
     const container = document.getElementById("reviews-grid");
     if (!container) return;
+
     if (!reviews.length) {
       container.innerHTML =
         '<div style="text-align:center; padding:40px;">✨ Пока нет опубликованных отзывов. Будьте первым!</div>';
       return;
     }
+
     container.innerHTML = reviews
       .map(
         (r) => `
@@ -335,7 +360,7 @@ async function loadPublishedReviews() {
                     <div class="review-avatar">${(r.author || "А").charAt(0).toUpperCase()}</div>
                     <div class="review-info">
                         <div class="review-author">${escapeHtml(r.author)}</div>
-                        <div class="review-date">${r.date}</div>
+                        <div class="review-date">${formatDate(r.date)}</div>
                         <div class="review-stars">${"★".repeat(r.rating)}${"☆".repeat(5 - r.rating)}</div>
                     </div>
                 </div>
@@ -351,6 +376,7 @@ async function loadPublishedReviews() {
 
 // === ЧАТ ===
 function sendMessage() {
+  if (!requireAuth("написать в чат")) return;
   const input = document.getElementById("chat-input");
   const message = input.value.trim();
   if (!message) return;
@@ -382,6 +408,7 @@ function getBakerReply(message) {
 }
 
 function sendQuickMessage(text) {
+  if (!requireAuth("написать в чат")) return;
   const messagesDiv = document.getElementById("chat-messages");
   messagesDiv.innerHTML += `<div class="message user">${text}</div>`;
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -398,6 +425,7 @@ function escapeHtml(str) {
   );
 }
 
+// === ЗАКАЗ ===
 async function submitOrder() {
   if (!requireAuth("оформить заказ")) return;
   const name = document.getElementById("name")?.value.trim();
@@ -429,12 +457,28 @@ async function submitOrder() {
 }
 
 // === ИНИЦИАЛИЗАЦИЯ ===
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function () {
   updateCartUI();
+  updateHeader();
   loadPublishedReviews();
+
+  // Загрузка товаров
   if (document.getElementById("popular-grid")) loadProducts("popular-grid", 3);
   if (document.getElementById("catalog-grid")) loadProducts("catalog-grid");
-  window.addEventListener("storage", (e) => {
+
+  window.addEventListener("storage", function (e) {
     if (e.key === "sweeter_cart") updateCartUI();
   });
 });
+
+// === ФОРМАТИРОВАНИЕ ДАТЫ ===
+function formatDate(isoString) {
+  const date = new Date(isoString);
+  const day = date.getDate();
+  const month = date.toLocaleString("ru", { month: "long" });
+  const year = date.getFullYear();
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+
+  return `${day} ${month} ${year}, ${hours}:${minutes}`;
+}

@@ -141,3 +141,16 @@ app.listen(PORT, () => {
   console.log(`✅ Сервер Sweeter запущен на http://localhost:${PORT}`);
   console.log(`📦 База данных: sweeter (PostgreSQL)`);
 });
+
+// Получить все заказы (для админа)
+app.get("/api/orders/all", async (req, res) => {
+  const result = await pool.query("SELECT * FROM orders ORDER BY id DESC");
+  res.json(result.rows);
+});
+
+// Удалить заказ
+app.delete("/api/orders/:id", async (req, res) => {
+  const { id } = req.params;
+  await pool.query("DELETE FROM orders WHERE id = $1", [id]);
+  res.json({ success: true });
+});

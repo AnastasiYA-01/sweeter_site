@@ -12,9 +12,9 @@
       <nav>
         <a href="index.html">Главная</a>
         <a href="catalog.html">Каталог</a>
-        <a href="order.html">Заказ</a>
-        <a href="chat.html">Чат</a>
-        <a href="profile.html">👤 Профиль</a>
+        <a href="order.html" id="nav-order">Заказ</a>
+        <a href="chat.html" id="nav-chat">Чат</a>
+        <a href="profile.html" id="nav-profile">👤 Профиль</a>
         <div class="cart-icon" onclick="toggleCart()">
           🛒 <span id="cart-count" class="cart-count">0</span>
         </div>
@@ -44,67 +44,8 @@
     </div>
 
     <main>
-      <div class="chat-container">
-        <div class="chat-header">
-          <span class="chat-avatar">👩‍🍳</span>
-          <div>
-            <div class="chat-name">Сладкая сказка</div>
-            <div class="chat-status">онлайн</div>
-          </div>
-        </div>
-        <div class="chat-messages" id="chat-messages">
-          <div class="message baker">🍰 Добро пожаловать! Чем могу помочь?</div>
-          <div class="message baker">
-            Можете спросить про цены, доставку, состав или аллергены!
-          </div>
-        </div>
-        <div class="chat-quick">
-          <button
-            class="quick-btn"
-            onclick="sendQuickMessage('Сколько стоят торты?')"
-          >
-            💰 Цены
-          </button>
-          <button
-            class="quick-btn"
-            onclick="sendQuickMessage('Какая доставка?')"
-          >
-            🚚 Доставка
-          </button>
-          <button
-            class="quick-btn"
-            onclick="sendQuickMessage('Состав десертов?')"
-          >
-            📜 Состав
-          </button>
-          <button
-            class="quick-btn"
-            onclick="sendQuickMessage('Можно без сахара?')"
-          >
-            🍬 Без сахара
-          </button>
-          <button
-            class="quick-btn"
-            onclick="sendQuickMessage('Аллергия на орехи')"
-          >
-            🥜 Аллергия
-          </button>
-          <button
-            class="quick-btn"
-            onclick="sendQuickMessage('Можно заказать на завтра?')"
-          >
-            📅 На завтра
-          </button>
-        </div>
-        <div class="chat-input">
-          <input
-            type="text"
-            id="chat-input"
-            placeholder="Напишите сообщение..."
-            onkeypress="if (event.key === 'Enter') sendMessage();"
-          />
-          <button class="btn" onclick="sendMessage()">📤 Отправить</button>
-        </div>
+      <div id="chat-container" class="chat-container">
+        <!-- Контент будет загружен через JS в зависимости от авторизации -->
       </div>
     </main>
 
@@ -112,8 +53,63 @@
       <p>© 2026 Sweeter — Вкусные моменты с доставкой</p>
       <p>📞 +7 (***) ***-**-** | 📧 ***@sweeter.ru</p>
       <p>📱 VK (скоро) | 💬 Telegram (скоро)</p>
+      <p style="margin-top: 10px">
+        <a href="admin.html" class="admin-link">👤 администратор</a>
+      </p>
     </footer>
 
     <script src="main.js"></script>
+    <script>
+      // Проверяем авторизацию и показываем соответствующий интерфейс
+      document.addEventListener("DOMContentLoaded", function () {
+        const isLoggedIn =
+          localStorage.getItem("sweeter_current_user") !== null;
+        const container = document.getElementById("chat-container");
+
+        if (isLoggedIn) {
+          // Показываем полноценный чат для авторизованных
+          container.innerHTML = `
+                    <div class="chat-header">
+                        <span class="chat-avatar">👩‍🍳</span>
+                        <div>
+                            <div class="chat-name">Сладкая сказка</div>
+                            <div class="chat-status">онлайн</div>
+                        </div>
+                    </div>
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message baker">🍰 Добро пожаловать! Чем могу помочь?</div>
+                        <div class="message baker">Можете спросить про цены, доставку, состав или аллергены!</div>
+                    </div>
+                    <div class="chat-quick">
+                        <button class="quick-btn" onclick="sendQuickMessage('Сколько стоят торты?')">💰 Цены</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Какая доставка?')">🚚 Доставка</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Состав десертов?')">📜 Состав</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Можно без сахара?')">🍬 Без сахара</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Аллергия на орехи')">🥜 Аллергия</button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Можно заказать на завтра?')">📅 На завтра</button>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chat-input" placeholder="Напишите сообщение..." onkeypress="if(event.key==='Enter') sendMessage()">
+                        <button class="btn" onclick="sendMessage()">📤 Отправить</button>
+                    </div>
+                `;
+        } else {
+          // Показываем сообщение о необходимости авторизации
+          container.innerHTML = `
+                    <div class="chat-auth-message">
+                        <p>🔐 Чтобы начать общение с кондитером, пожалуйста, <a href="login.html" style="color: #FF9F8C;">войдите в аккаунт</a>.</p>
+                        <p style="margin-top: 15px;">После авторизации вам будут доступны:</p>
+                        <ul style="text-align: left; display: inline-block; margin-top: 10px;">
+                            <li>💬 Общение с кондитером</li>
+                            <li>🛒 Добавление товаров в корзину</li>
+                            <li>📝 Оформление заказов</li>
+                            <li>⭐ Написание отзывов</li>
+                        </ul>
+                        <p style="margin-top: 20px;"><a href="login.html" class="btn">Войти или зарегистрироваться</a></p>
+                    </div>
+                `;
+        }
+      });
+    </script>
   </body>
 </html>

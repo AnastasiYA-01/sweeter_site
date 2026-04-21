@@ -164,12 +164,6 @@
         padding: 60px;
         color: #999;
       }
-      .admin-footer {
-        margin-top: 40px;
-        text-align: center;
-        color: #999;
-        font-size: 12px;
-      }
     </style>
   </head>
   <body>
@@ -180,7 +174,6 @@
         <a href="catalog.html">Каталог</a>
         <a href="order.html">Заказ</a>
         <a href="chat.html">Чат</a>
-        <a href="profile.html">👤 Профиль</a>
         <div class="cart-icon" onclick="toggleCart()">
           🛒 <span id="cart-count" class="cart-count">0</span>
         </div>
@@ -209,7 +202,6 @@
     </div>
 
     <main>
-      <!-- Форма входа -->
       <div id="login-container" class="login-container">
         <h2>🔐 Панель администратора</h2>
         <p style="color: #999; margin-bottom: 20px">Введите пароль для входа</p>
@@ -217,7 +209,6 @@
         <button class="btn" onclick="checkPassword()">Войти</button>
       </div>
 
-      <!-- Админ-панель (скрыта до входа) -->
       <div id="admin-container" class="admin-container">
         <h1>📋 Панель управления</h1>
 
@@ -226,9 +217,11 @@
           <div class="tab" onclick="showTab('reviews')">
             💬 Отзывы (на модерации)
           </div>
+          <div class="tab" onclick="showTab('approved')">
+            ✅ Одобренные отзывы
+          </div>
         </div>
 
-        <!-- Вкладка Заказы -->
         <div id="orders-tab">
           <div class="filters">
             <button
@@ -270,9 +263,12 @@
           <div id="orders-container"></div>
         </div>
 
-        <!-- Вкладка Отзывы на модерации -->
         <div id="reviews-tab" style="display: none">
           <div id="pending-reviews-container"></div>
+        </div>
+
+        <div id="approved-tab" style="display: none">
+          <div id="approved-reviews-container"></div>
         </div>
       </div>
     </main>
@@ -281,12 +277,25 @@
       <p>© 2026 Sweeter — Вкусные моменты с доставкой</p>
       <p>📞 +7 (***) ***-**-** | 📧 ***@sweeter.ru</p>
       <p>📱 VK (скоро) | 💬 Telegram (скоро)</p>
+      <p style="margin-top: 10px">
+        <a href="admin.html" class="admin-link">👤 администратор</a>
+      </p>
     </footer>
 
     <script src="main.js"></script>
     <script>
       const ADMIN_PASSWORD = "свитер";
       let currentFilter = "all";
+
+      function formatDate(isoString) {
+        const date = new Date(isoString);
+        const day = date.getDate();
+        const month = date.toLocaleString("ru", { month: "long" });
+        const year = date.getFullYear();
+        const hours = date.getHours().toString().padStart(2, "0");
+        const minutes = date.getMinutes().toString().padStart(2, "0");
+        return `${day} ${month} ${year}, ${hours}:${minutes}`;
+      }
 
       function checkPassword() {
         const input = document.getElementById("password-input").value;
@@ -295,6 +304,7 @@
           document.getElementById("admin-container").style.display = "block";
           loadOrders();
           loadPendingReviews();
+          loadApprovedReviews();
           showNotification("Добро пожаловать в админ-панель!", "success");
         } else {
           showNotification("Неверный пароль!", "error");
@@ -307,99 +317,214 @@
           .forEach((t) => t.classList.remove("active"));
         event.target.classList.add("active");
 
+        document.getElementById("orders-tab").style.display = "none";
+        document.getElementById("reviews-tab").style.display = "none";
+        document.getElementById("approved-tab").style.display = "none";
+
         if (tab === "orders") {
           document.getElementById("orders-tab").style.display = "block";
-          document.getElementById("reviews-tab").style.display = "none";
           loadOrders();
-        } else {
-          document.getElementById("orders-tab").style.display = "none";
+        } else if (tab === "reviews") {
           document.getElementById("reviews-tab").style.display = "block";
           loadPendingReviews();
+        } else {
+          document.getElementById("approved-tab").style.display = "block";
+          loadApprovedReviews();
         }
       }
 
-      function loadOrders() {
-        const orders = JSON.parse(
-          localStorage.getItem("sweeter_orders") || "[]",
-        );
-        let filteredOrders = orders;
+      async function loadOrders() {
+        try {
+          const orders = await apiRequest("/orders/all", "GET");
+          let filteredOrders = orders;
+          if (currentFilter !== "all") {
+            filteredOrders = orders.filter((o) => o.status === currentFilter);
+          }
+          filteredOrders.sort((a, b) => b.id - a.id);
 
-        if (currentFilter !== "all") {
-          filteredOrders = orders.filter((o) => o.status === currentFilter);
-        }
+          const container = document.getElementById("orders-container");
+          if (filteredOrders.length === 0) {
+            container.innerHTML =
+              '<div class="empty-state">📭 Нет заказов</div>';
+            return;
+          }
 
-        filteredOrders.sort((a, b) => b.id - a.id);
-
-        const container = document.getElementById("orders-container");
-
-        if (filteredOrders.length === 0) {
-          container.innerHTML = '<div class="empty-state">📭 Нет заказов</div>';
-          return;
-        }
-
-        container.innerHTML = filteredOrders
-          .map(
-            (order) => `
-                <div class="order-card">
-                    <div class="order-header">
-                        <div>
-                            <span class="order-id">Заказ #${order.id}</span>
-                            <span class="order-date"> | ${order.date}</span>
+          container.innerHTML = filteredOrders
+            .map(
+              (order) => `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <span class="order-id">Заказ #${order.id}</span>
+                                <span class="order-date"> | ${formatDate(order.order_date || order.date)}</span>
+                            </div>
+                            <div>
+                                <select class="status-select" onchange="updateStatus(${order.id}, this.value)">
+                                    <option value="Новый" ${order.status === "Новый" ? "selected" : ""}>🆕 Новый</option>
+                                    <option value="Готовится" ${order.status === "Готовится" ? "selected" : ""}>👩‍🍳 Готовится</option>
+                                    <option value="Доставляется" ${order.status === "Доставляется" ? "selected" : ""}>🚚 Доставляется</option>
+                                    <option value="Выполнен" ${order.status === "Выполнен" ? "selected" : ""}>✅ Выполнен</option>
+                                </select>
+                                <button class="delete-btn" onclick="deleteOrder(${order.id})">🗑️</button>
+                            </div>
                         </div>
-                        <div>
-                            <select class="status-select" onchange="updateStatus(${order.id}, this.value)">
-                                <option value="Новый" ${order.status === "Новый" ? "selected" : ""}>🆕 Новый</option>
-                                <option value="Готовится" ${order.status === "Готовится" ? "selected" : ""}>👩‍🍳 Готовится</option>
-                                <option value="Доставляется" ${order.status === "Доставляется" ? "selected" : ""}>🚚 Доставляется</option>
-                                <option value="Выполнен" ${order.status === "Выполнен" ? "selected" : ""}>✅ Выполнен</option>
-                            </select>
-                            <button class="delete-btn" onclick="deleteOrder(${order.id})">🗑️</button>
+                        <div class="order-details">
+                            <div class="detail-item"><span class="detail-label">👤 Имя:</span> ${escapeHtml(order.name)}</div>
+                            <div class="detail-item"><span class="detail-label">📞 Телефон:</span> ${escapeHtml(order.phone)}</div>
+                            <div class="detail-item"><span class="detail-label">🏠 Адрес:</span> ${escapeHtml(order.address)}</div>
+                            <div class="detail-item"><span class="detail-label">💰 Сумма:</span> ${order.total} ₽</div>
+                            <div class="detail-item"><span class="detail-label">💬 Комментарий:</span> ${order.comment || "—"}</div>
+                        </div>
+                        <div class="items-list">
+                            <strong>🍰 Состав заказа:</strong><br>
+                            ${order.items.map((item) => `${item.name} x${item.quantity} = ${item.price * item.quantity} ₽`).join("<br>")}
                         </div>
                     </div>
-                    
-                    <div class="order-details">
-                        <div class="detail-item"><span class="detail-label">👤 Имя:</span> ${escapeHtml(order.name)}</div>
-                        <div class="detail-item"><span class="detail-label">📞 Телефон:</span> ${escapeHtml(order.phone)}</div>
-                        <div class="detail-item"><span class="detail-label">🏠 Адрес:</span> ${escapeHtml(order.address)}</div>
-                        <div class="detail-item"><span class="detail-label">💰 Сумма:</span> ${order.total} ₽</div>
-                        <div class="detail-item"><span class="detail-label">💬 Комментарий:</span> ${order.comment || "—"}</div>
-                    </div>
-                    
-                    <div class="items-list">
-                        <strong>🍰 Состав заказа:</strong><br>
-                        ${order.items.map((item) => `${item.name} x${item.quantity} = ${item.price * item.quantity} ₽`).join("<br>")}
-                    </div>
-                </div>
-            `,
-          )
-          .join("");
+                `,
+            )
+            .join("");
+        } catch (error) {
+          console.error(error);
+        }
       }
 
-      function updateStatus(orderId, newStatus) {
-        const orders = JSON.parse(
-          localStorage.getItem("sweeter_orders") || "[]",
-        );
-        const order = orders.find((o) => o.id == orderId);
-        if (order) {
-          order.status = newStatus;
-          localStorage.setItem("sweeter_orders", JSON.stringify(orders));
-          loadOrders();
-          showNotification(
-            `Статус заказа #${orderId} изменён на «${newStatus}»`,
-            "success",
+      async function loadPendingReviews() {
+        try {
+          const reviews = await apiRequest("/reviews/pending", "GET");
+          const container = document.getElementById(
+            "pending-reviews-container",
           );
+
+          if (!reviews.length) {
+            container.innerHTML =
+              '<div class="empty-state">💬 Нет отзывов на модерации</div>';
+            return;
+          }
+
+          container.innerHTML = reviews
+            .map(
+              (review) => `
+                    <div class="review-card-admin">
+                        <div class="review-content">
+                            <div class="review-header">
+                                <div class="review-avatar">${(review.author || "А").charAt(0).toUpperCase()}</div>
+                                <div class="review-info">
+                                    <div class="review-author">${escapeHtml(review.author)}</div>
+                                    <div class="review-date">${formatDate(review.date)}</div>
+                                    <div class="review-stars">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</div>
+                                </div>
+                            </div>
+                            <div class="review-text">«${escapeHtml(review.text)}»</div>
+                        </div>
+                        <div class="review-actions">
+                            <button class="approve-btn" onclick="approveReview(${review.id})">✅ Одобрить</button>
+                            <button class="reject-btn" onclick="rejectReview(${review.id})">❌ Удалить</button>
+                        </div>
+                    </div>
+                `,
+            )
+            .join("");
+        } catch (error) {
+          console.error(error);
         }
       }
 
-      function deleteOrder(orderId) {
+      async function loadApprovedReviews() {
+        try {
+          const reviews = await apiRequest("/reviews/published", "GET");
+          const container = document.getElementById(
+            "approved-reviews-container",
+          );
+
+          if (!reviews.length) {
+            container.innerHTML =
+              '<div class="empty-state">✅ Нет одобренных отзывов</div>';
+            return;
+          }
+
+          container.innerHTML = reviews
+            .map(
+              (review) => `
+                    <div class="review-card-admin">
+                        <div class="review-content">
+                            <div class="review-header">
+                                <div class="review-avatar">${(review.author || "А").charAt(0).toUpperCase()}</div>
+                                <div class="review-info">
+                                    <div class="review-author">${escapeHtml(review.author)}</div>
+                                    <div class="review-date">${formatDate(review.date)}</div>
+                                    <div class="review-stars">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</div>
+                                </div>
+                            </div>
+                            <div class="review-text">«${escapeHtml(review.text)}»</div>
+                        </div>
+                        <div class="review-actions">
+                            <button class="reject-btn" onclick="deleteApprovedReview(${review.id})">🗑️ Удалить</button>
+                        </div>
+                    </div>
+                `,
+            )
+            .join("");
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      async function updateStatus(orderId, newStatus) {
+        try {
+          await apiRequest(`/orders/${orderId}/status`, "PUT", {
+            status: newStatus,
+          });
+          loadOrders();
+          showNotification(`Статус заказа #${orderId} изменён`, "success");
+        } catch (error) {
+          showNotification(error.message, "error");
+        }
+      }
+
+      async function deleteOrder(orderId) {
         if (confirm("Удалить заказ?")) {
-          let orders = JSON.parse(
-            localStorage.getItem("sweeter_orders") || "[]",
-          );
-          orders = orders.filter((o) => o.id != orderId);
-          localStorage.setItem("sweeter_orders", JSON.stringify(orders));
-          loadOrders();
-          showNotification(`Заказ #${orderId} удалён`, "info");
+          try {
+            await apiRequest(`/orders/${orderId}`, "DELETE");
+            loadOrders();
+            showNotification(`Заказ #${orderId} удалён`, "success");
+          } catch (error) {
+            showNotification(error.message, "error");
+          }
+        }
+      }
+
+      async function approveReview(reviewId) {
+        try {
+          await apiRequest(`/reviews/${reviewId}/approve`, "PUT");
+          loadPendingReviews();
+          loadApprovedReviews();
+          showNotification("Отзыв одобрен и опубликован", "success");
+        } catch (error) {
+          showNotification(error.message, "error");
+        }
+      }
+
+      async function rejectReview(reviewId) {
+        if (confirm("Удалить отзыв без публикации?")) {
+          try {
+            await apiRequest(`/reviews/${reviewId}`, "DELETE");
+            loadPendingReviews();
+            showNotification("Отзыв удалён", "success");
+          } catch (error) {
+            showNotification(error.message, "error");
+          }
+        }
+      }
+
+      async function deleteApprovedReview(reviewId) {
+        if (confirm("Удалить опубликованный отзыв?")) {
+          try {
+            await apiRequest(`/reviews/${reviewId}`, "DELETE");
+            loadApprovedReviews();
+            showNotification("Отзыв удалён", "success");
+          } catch (error) {
+            showNotification(error.message, "error");
+          }
         }
       }
 
@@ -418,102 +543,9 @@
         loadOrders();
       }
 
-      function loadPendingReviews() {
-        const pendingReviews = JSON.parse(
-          localStorage.getItem("sweeter_pending_reviews") || "[]",
-        );
-        const container = document.getElementById("pending-reviews-container");
-
-        if (pendingReviews.length === 0) {
-          container.innerHTML =
-            '<div class="empty-state">💬 Нет отзывов на модерации</div>';
-          return;
-        }
-
-        container.innerHTML = pendingReviews
-          .map(
-            (review) => `
-                <div class="review-card-admin">
-                    <div class="review-content">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <div class="review-avatar" style="width: 40px; height: 40px; background: #FF9F8C; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">${getAvatar(review.author)}</div>
-                            <div>
-                                <strong>${escapeHtml(review.author)}</strong>
-                                <div class="review-stars">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</div>
-                            </div>
-                        </div>
-                        <div class="review-text" style="margin-bottom: 10px;">«${escapeHtml(review.text)}»</div>
-                        <div style="font-size: 12px; color: #999;">${review.date}</div>
-                    </div>
-                    <div class="review-actions">
-                        <button class="approve-btn" onclick="approveReview(${review.id})">✅ Опубликовать</button>
-                        <button class="reject-btn" onclick="rejectReview(${review.id})">❌ Удалить</button>
-                    </div>
-                </div>
-            `,
-          )
-          .join("");
-      }
-
-      function approveReview(reviewId) {
-        let pendingReviews = JSON.parse(
-          localStorage.getItem("sweeter_pending_reviews") || "[]",
-        );
-        const review = pendingReviews.find((r) => r.id === reviewId);
-
-        if (review) {
-          pendingReviews = pendingReviews.filter((r) => r.id !== reviewId);
-          localStorage.setItem(
-            "sweeter_pending_reviews",
-            JSON.stringify(pendingReviews),
-          );
-
-          const publishedReviews = JSON.parse(
-            localStorage.getItem("sweeter_published_reviews") || "[]",
-          );
-          review.status = "published";
-          publishedReviews.push(review);
-          localStorage.setItem(
-            "sweeter_published_reviews",
-            JSON.stringify(publishedReviews),
-          );
-
-          loadPendingReviews();
-          showNotification("Отзыв опубликован!", "success");
-        }
-      }
-
-      function rejectReview(reviewId) {
-        if (confirm("Удалить этот отзыв без публикации?")) {
-          let pendingReviews = JSON.parse(
-            localStorage.getItem("sweeter_pending_reviews") || "[]",
-          );
-          pendingReviews = pendingReviews.filter((r) => r.id !== reviewId);
-          localStorage.setItem(
-            "sweeter_pending_reviews",
-            JSON.stringify(pendingReviews),
-          );
-          loadPendingReviews();
-          showNotification("Отзыв удалён", "info");
-        }
-      }
-
-      function getAvatar(name) {
-        return name ? name.charAt(0).toUpperCase() : "?";
-      }
-
-      function escapeHtml(str) {
-        if (!str) return "";
-        return str.replace(/[&<>]/g, function (m) {
-          if (m === "&") return "&amp;";
-          if (m === "<") return "&lt;";
-          if (m === ">") return "&gt;";
-          return m;
-        });
-      }
-
       document.addEventListener("DOMContentLoaded", function () {
         updateCartUI();
+        updateHeader();
       });
     </script>
   </body>

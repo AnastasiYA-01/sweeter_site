@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Тест регистрации</title>
+    <style>
+      body {
+        font-family: monospace;
+        padding: 20px;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 10px;
+        cursor: pointer;
+      }
+      pre {
+        background: #f0f0f0;
+        padding: 15px;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>🧪 Тест API Sweeter</h2>
+
+    <button onclick="testRegister()">📝 Зарегистрировать пользователя</button>
+    <button onclick="testLogin()">🔐 Войти</button>
+    <button onclick="checkUsers()">👥 Посмотреть всех пользователей</button>
+
+    <h3>Результат:</h3>
+    <pre id="result">Нажмите на кнопку...</pre>
+
+    <script>
+      const API_URL = "http://localhost:3000/api";
+
+      async function testRegister() {
+        const result = document.getElementById("result");
+        result.textContent = "⏳ Регистрация...";
+
+        try {
+          const response = await fetch(`${API_URL}/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: "Анастасия",
+              email: "nastya@test.ru",
+              phone: "+7 (999) 111-22-33",
+              password: "12345",
+            }),
+          });
+          const data = await response.json();
+          result.textContent = JSON.stringify(data, null, 2);
+
+          if (response.ok) {
+            alert("✅ Регистрация успешна! Теперь попробуйте войти.");
+          } else {
+            alert("❌ Ошибка: " + (data.error || "Неизвестная ошибка"));
+          }
+        } catch (error) {
+          result.textContent = "❌ Ошибка: " + error.message;
+          alert(
+            "Ошибка соединения с сервером. Убедитесь, что сервер запущен (node server.js)",
+          );
+        }
+      }
+
+      async function testLogin() {
+        const result = document.getElementById("result");
+        result.textContent = "⏳ Вход...";
+
+        try {
+          const response = await fetch(`${API_URL}/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: "nastya@test.ru",
+              password: "12345",
+            }),
+          });
+          const data = await response.json();
+          result.textContent = JSON.stringify(data, null, 2);
+
+          if (response.ok) {
+            localStorage.setItem(
+              "sweeter_current_user",
+              JSON.stringify(data.user),
+            );
+            alert(`✅ Добро пожаловать, ${data.user.name}!`);
+          } else {
+            alert(
+              "❌ Ошибка входа: " + (data.error || "Неверный email или пароль"),
+            );
+          }
+        } catch (error) {
+          result.textContent = "❌ Ошибка: " + error.message;
+          alert("Ошибка соединения с сервером");
+        }
+      }
+
+      async function checkUsers() {
+        const result = document.getElementById("result");
+        result.textContent = "⏳ Загрузка...";
+
+        try {
+          const response = await fetch(`${API_URL}/users/all`);
+          const users = await response.json();
+          result.textContent = JSON.stringify(users, null, 2);
+        } catch (error) {
+          result.textContent = "❌ Ошибка: " + error.message;
+        }
+      }
+    </script>
+  </body>
+</html>

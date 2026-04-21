@@ -12,9 +12,9 @@
       <nav>
         <a href="index.html">Главная</a>
         <a href="catalog.html">Каталог</a>
-        <a href="order.html">Заказ</a>
-        <a href="chat.html">Чат</a>
-        <a href="profile.html">👤 Профиль</a>
+        <a href="order.html" id="nav-order">Заказ</a>
+        <a href="chat.html" id="nav-chat">Чат</a>
+        <a href="profile.html" id="nav-profile">👤 Профиль</a>
         <div class="cart-icon" onclick="toggleCart()">
           🛒 <span id="cart-count" class="cart-count">0</span>
         </div>
@@ -51,19 +51,53 @@
         <a href="catalog.html" class="btn hero-btn">Смотреть каталог</a>
       </section>
 
-      <!-- Категории -->
+      <!-- Категории с выпадающей панелью -->
       <section class="categories">
         <h2>🍬 Выбери свой десерт</h2>
         <div class="category-grid">
-          <div class="category" onclick="filterCategory('Торты')">🍰 Торты</div>
-          <div class="category" onclick="filterCategory('Пирожные')">
-            🧁 Пирожные
+          <div class="category-item">
+            <div class="category-title">🍰 Торты</div>
+            <div class="category-dropdown">
+              <ul>
+                <li>Медовик</li>
+                <li>Наполеон</li>
+                <li>Красный бархат</li>
+                <li>Чизкейк</li>
+              </ul>
+            </div>
           </div>
-          <div class="category" onclick="filterCategory('Печенье')">
-            🍪 Печенье
+          <div class="category-item">
+            <div class="category-title">🧁 Пирожные</div>
+            <div class="category-dropdown">
+              <ul>
+                <li>Эклер</li>
+                <li>Заварное</li>
+                <li>Картошка</li>
+                <li>Корзинка</li>
+              </ul>
+            </div>
           </div>
-          <div class="category" onclick="filterCategory('Капкейки')">
-            🎂 Капкейки
+          <div class="category-item">
+            <div class="category-title">🍪 Печенье</div>
+            <div class="category-dropdown">
+              <ul>
+                <li>Овсяное</li>
+                <li>Шоколадное</li>
+                <li>Песочное</li>
+                <li>Имбирное</li>
+              </ul>
+            </div>
+          </div>
+          <div class="category-item">
+            <div class="category-title">🎂 Капкейки</div>
+            <div class="category-dropdown">
+              <ul>
+                <li>Ванильный</li>
+                <li>Шоколадный</li>
+                <li>Карамельный</li>
+                <li>Клубничный</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
@@ -74,61 +108,25 @@
         <div class="product-grid" id="popular-grid"></div>
       </section>
 
-      <!-- Отзывы -->
+      <!-- Отзывы (только для просмотра, форма — только авторизованным) -->
       <section class="reviews">
         <h2>💬 Отзывы наших клиентов</h2>
         <div class="reviews-grid" id="reviews-grid"></div>
 
-        <!-- Форма добавления отзыва -->
+        <!-- Форма добавления отзыва (показываем только авторизованным) -->
         <div
-          style="
-            text-align: center;
-            margin-top: 40px;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-          "
+          id="review-form-container"
+          class="review-form-container"
+          style="display: none"
         >
           <h3>✨ Оставить отзыв</h3>
           <textarea
             id="review-text"
             rows="2"
             placeholder="Ваш отзыв..."
-            style="
-              width: 100%;
-              padding: 12px;
-              border-radius: 16px;
-              border: 1px solid #ddd;
-              margin-bottom: 10px;
-              font-family: inherit;
-            "
           ></textarea>
-          <input
-            type="text"
-            id="review-author"
-            placeholder="Ваше имя"
-            style="
-              width: 100%;
-              padding: 12px;
-              border-radius: 16px;
-              border: 1px solid #ddd;
-              margin-bottom: 10px;
-            "
-          />
-          <select
-            id="review-rating"
-            style="
-              width: 100%;
-              padding: 12px;
-              border-radius: 16px;
-              border: 1px solid #ddd;
-              margin-bottom: 10px;
-            "
-          >
+          <input type="text" id="review-author" placeholder="Ваше имя" />
+          <select id="review-rating">
             <option value="5">★★★★★ 5</option>
             <option value="4">★★★★☆ 4</option>
             <option value="3">★★★☆☆ 3</option>
@@ -140,6 +138,17 @@
           </button>
           <p style="font-size: 12px; color: #999; margin-top: 10px">
             Отзыв будет опубликован после проверки администратором
+          </p>
+        </div>
+        <div
+          id="review-auth-message"
+          class="review-form-container"
+          style="display: none; text-align: center"
+        >
+          <p>
+            🔐
+            <a href="login.html" style="color: #ff9f8c">Войдите в аккаунт</a>,
+            чтобы оставить отзыв
           </p>
         </div>
       </section>
@@ -155,5 +164,22 @@
     </footer>
 
     <script src="main.js"></script>
+    <script>
+      // Показываем форму отзыва только авторизованным пользователям
+      document.addEventListener("DOMContentLoaded", function () {
+        const isLoggedIn =
+          localStorage.getItem("sweeter_current_user") !== null;
+        const formContainer = document.getElementById("review-form-container");
+        const authMessage = document.getElementById("review-auth-message");
+
+        if (isLoggedIn) {
+          formContainer.style.display = "block";
+          authMessage.style.display = "none";
+        } else {
+          formContainer.style.display = "none";
+          authMessage.style.display = "block";
+        }
+      });
+    </script>
   </body>
 </html>
