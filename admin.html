@@ -55,28 +55,6 @@
         color: #666;
         font-size: 14px;
       }
-      .order-status {
-        padding: 5px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: bold;
-      }
-      .status-new {
-        background: #ffe0e0;
-        color: #ff6b6b;
-      }
-      .status-cooking {
-        background: #fff0db;
-        color: #ff9f8c;
-      }
-      .status-delivery {
-        background: #e0f0ff;
-        color: #4a90e2;
-      }
-      .status-done {
-        background: #e0ffe0;
-        color: #4caf50;
-      }
       .order-details {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -186,6 +164,12 @@
         padding: 60px;
         color: #999;
       }
+      .admin-footer {
+        margin-top: 40px;
+        text-align: center;
+        color: #999;
+        font-size: 12px;
+      }
     </style>
   </head>
   <body>
@@ -196,6 +180,7 @@
         <a href="catalog.html">Каталог</a>
         <a href="order.html">Заказ</a>
         <a href="chat.html">Чат</a>
+        <a href="profile.html">👤 Профиль</a>
         <div class="cart-icon" onclick="toggleCart()">
           🛒 <span id="cart-count" class="cart-count">0</span>
         </div>
@@ -203,12 +188,20 @@
     </header>
 
     <div id="cart-modal" class="cart-modal">
-      <h3>Корзина</h3>
+      <h3>🛒 Корзина</h3>
+      <div class="cart-header">
+        <span>Количество</span>
+        <span>Товар</span>
+        <span></span>
+      </div>
       <div id="cart-items" class="cart-items">Корзина пуста</div>
-      <div>Итого: <span id="cart-total">0</span> ₽</div>
+      <div class="cart-total">
+        <span>Итого:</span>
+        <span id="cart-total">0</span>
+        <span>₽</span>
+      </div>
       <button
-        class="btn"
-        style="width: 100%; margin-top: 15px"
+        class="btn cart-checkout-btn"
         onclick="location.href = 'order.html'"
       >
         Оформить заказ
@@ -288,9 +281,6 @@
       <p>© 2026 Sweeter — Вкусные моменты с доставкой</p>
       <p>📞 +7 (***) ***-**-** | 📧 ***@sweeter.ru</p>
       <p>📱 VK (скоро) | 💬 Telegram (скоро)</p>
-      <p style="margin-top: 10px">
-        <a href="admin.html" class="admin-link">👤 администратор</a>
-      </p>
     </footer>
 
     <script src="main.js"></script>
@@ -298,7 +288,6 @@
       const ADMIN_PASSWORD = "свитер";
       let currentFilter = "all";
 
-      // === ВХОД ПО ПАРОЛЮ ===
       function checkPassword() {
         const input = document.getElementById("password-input").value;
         if (input === ADMIN_PASSWORD) {
@@ -312,7 +301,6 @@
         }
       }
 
-      // === ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ===
       function showTab(tab) {
         document
           .querySelectorAll(".tab")
@@ -330,7 +318,6 @@
         }
       }
 
-      // === ЗАГРУЗКА ЗАКАЗОВ ===
       function loadOrders() {
         const orders = JSON.parse(
           localStorage.getItem("sweeter_orders") || "[]",
@@ -416,7 +403,6 @@
         }
       }
 
-      // === ФИЛЬТРАЦИЯ ЗАКАЗОВ ===
       function filterOrders(filter) {
         currentFilter = filter;
         document.querySelectorAll(".filter-btn").forEach((btn) => {
@@ -432,7 +418,6 @@
         loadOrders();
       }
 
-      // === ОТЗЫВЫ НА МОДЕРАЦИИ ===
       function loadPendingReviews() {
         const pendingReviews = JSON.parse(
           localStorage.getItem("sweeter_pending_reviews") || "[]",
@@ -451,7 +436,7 @@
                 <div class="review-card-admin">
                     <div class="review-content">
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <div style="width: 40px; height: 40px; background: #FF9F8C; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">${getAvatar(review.author)}</div>
+                            <div class="review-avatar" style="width: 40px; height: 40px; background: #FF9F8C; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">${getAvatar(review.author)}</div>
                             <div>
                                 <strong>${escapeHtml(review.author)}</strong>
                                 <div class="review-stars">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</div>
@@ -477,14 +462,12 @@
         const review = pendingReviews.find((r) => r.id === reviewId);
 
         if (review) {
-          // Удаляем из ожидающих
           pendingReviews = pendingReviews.filter((r) => r.id !== reviewId);
           localStorage.setItem(
             "sweeter_pending_reviews",
             JSON.stringify(pendingReviews),
           );
 
-          // Добавляем в опубликованные
           const publishedReviews = JSON.parse(
             localStorage.getItem("sweeter_published_reviews") || "[]",
           );
@@ -516,7 +499,7 @@
       }
 
       function getAvatar(name) {
-        return name.charAt(0).toUpperCase();
+        return name ? name.charAt(0).toUpperCase() : "?";
       }
 
       function escapeHtml(str) {
@@ -529,7 +512,6 @@
         });
       }
 
-      // === КОРЗИНА (для отображения в админке) ===
       document.addEventListener("DOMContentLoaded", function () {
         updateCartUI();
       });

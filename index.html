@@ -14,6 +14,7 @@
         <a href="catalog.html">Каталог</a>
         <a href="order.html">Заказ</a>
         <a href="chat.html">Чат</a>
+        <a href="profile.html">👤 Профиль</a>
         <div class="cart-icon" onclick="toggleCart()">
           🛒 <span id="cart-count" class="cart-count">0</span>
         </div>
@@ -23,13 +24,19 @@
     <!-- Модальное окно корзины -->
     <div id="cart-modal" class="cart-modal">
       <h3>🛒 Корзина</h3>
+      <div class="cart-header">
+        <span>Количество</span>
+        <span>Товар</span>
+        <span></span>
+      </div>
       <div id="cart-items" class="cart-items">Корзина пуста</div>
-      <div style="margin-top: 10px; font-weight: bold">
-        Итого: <span id="cart-total">0</span> ₽
+      <div class="cart-total">
+        <span>Итого:</span>
+        <span id="cart-total">0</span>
+        <span>₽</span>
       </div>
       <button
-        class="btn"
-        style="width: 100%; margin-top: 15px"
+        class="btn cart-checkout-btn"
         onclick="location.href = 'order.html'"
       >
         Оформить заказ

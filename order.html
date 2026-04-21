@@ -14,6 +14,7 @@
         <a href="catalog.html">Каталог</a>
         <a href="order.html">Заказ</a>
         <a href="chat.html">Чат</a>
+        <a href="profile.html">👤 Профиль</a>
         <div class="cart-icon" onclick="toggleCart()">
           🛒 <span id="cart-count" class="cart-count">0</span>
         </div>
@@ -23,13 +24,19 @@
     <!-- Модальное окно корзины -->
     <div id="cart-modal" class="cart-modal">
       <h3>🛒 Корзина</h3>
+      <div class="cart-header">
+        <span>Количество</span>
+        <span>Товар</span>
+        <span></span>
+      </div>
       <div id="cart-items" class="cart-items">Корзина пуста</div>
-      <div style="margin-top: 10px; font-weight: bold">
-        Итого: <span id="cart-total">0</span> ₽
+      <div class="cart-total">
+        <span>Итого:</span>
+        <span id="cart-total">0</span>
+        <span>₽</span>
       </div>
       <button
-        class="btn"
-        style="width: 100%; margin-top: 15px"
+        class="btn cart-checkout-btn"
         onclick="location.href = 'order.html'"
       >
         Оформить заказ
@@ -57,12 +64,8 @@
         <!-- Форма для данных клиента -->
         <div class="form-group">
           <label>👤 Ваше имя</label>
-          <input
-            type="text"
-            id="name"
-            placeholder="Анастасия"
-            value="Геннадий"
-          />
+          <input type="text" id="name" placeholder="Анастасия" />
+          <small style="color: #999; font-size: 12px">Например: Геннадий</small>
         </div>
 
         <div class="form-group">
@@ -94,9 +97,6 @@
       <p>© 2026 Sweeter — Вкусные моменты с доставкой</p>
       <p>📞 +7 (***) ***-**-** | 📧 ***@sweeter.ru</p>
       <p>📱 VK (скоро) | 💬 Telegram (скоро)</p>
-      <p style="margin-top: 10px">
-        <a href="admin.html" class="admin-link">👤 администратор</a>
-      </p>
     </footer>
 
     <script src="main.js"></script>
@@ -139,8 +139,10 @@
             `;
       }
 
-      // Переопределяем submitOrder из main.js, чтобы он брал корзину
+      // Переопределяем submitOrder из main.js для этой страницы
       window.submitOrder = function () {
+        if (!requireAuth("оформить заказ")) return;
+
         const name = document.getElementById("name")?.value.trim();
         const phone = document.getElementById("phone")?.value.trim();
         const address = document.getElementById("address")?.value.trim();
@@ -158,6 +160,7 @@
           return;
         }
 
+        const currentUser = getCurrentUser();
         const order = {
           id: Date.now(),
           date: new Date().toLocaleString(),
@@ -165,6 +168,7 @@
           phone: phone,
           address: address,
           comment: comment || "",
+          email: currentUser?.email || "",
           items: cart,
           total: cart.reduce((s, i) => s + i.price * i.quantity, 0),
           status: "Новый",
@@ -179,6 +183,7 @@
         // Очищаем корзину
         localStorage.removeItem("sweeter_cart");
         updateCartUI();
+        updateAllQuantitySelectors();
 
         showNotification(
           `✅ Заказ оформлен, ${name}! Сумма: ${order.total} ₽`,

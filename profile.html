@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sweeter — Мой профиль</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .profile-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 20px;
+      }
+      .profile-card {
+        background: white;
+        border-radius: 30px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      }
+      .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+      }
+      .profile-avatar {
+        width: 80px;
+        height: 80px;
+        background: #ff9f8c;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        color: white;
+        font-weight: bold;
+      }
+      .profile-info h2 {
+        margin: 0 0 5px 0;
+        text-align: left;
+        font-size: 28px;
+      }
+      .profile-info p {
+        color: #666;
+        margin: 0;
+      }
+      .info-row {
+        display: flex;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+      }
+      .info-label {
+        width: 130px;
+        font-weight: bold;
+        color: #666;
+      }
+      .info-value {
+        flex: 1;
+        color: #4a4a4a;
+      }
+      .orders-title {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #4a4a4a;
+      }
+      .order-card {
+        background: #fff5f0;
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-left: 5px solid #ff9f8c;
+      }
+      .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #ffd4c4;
+      }
+      .order-number {
+        font-weight: bold;
+        color: #ff9f8c;
+      }
+      .order-date {
+        font-size: 14px;
+        color: #666;
+      }
+      .order-status {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+      }
+      .status-new {
+        background: #ffe0e0;
+        color: #ff6b6b;
+      }
+      .status-cooking {
+        background: #fff0db;
+        color: #ff9f8c;
+      }
+      .status-delivery {
+        background: #e0f0ff;
+        color: #4a90e2;
+      }
+      .status-done {
+        background: #e0ffe0;
+        color: #4caf50;
+      }
+      .order-items {
+        margin-top: 10px;
+        color: #666;
+        font-size: 14px;
+      }
+      .order-total {
+        margin-top: 10px;
+        text-align: right;
+        font-weight: bold;
+        color: #ff6b6b;
+      }
+      .order-address {
+        font-size: 12px;
+        color: #999;
+        margin-top: 8px;
+      }
+      .logout-btn {
+        background: none;
+        border: 1px solid #ff6b6b;
+        color: #ff6b6b;
+        padding: 10px 25px;
+        border-radius: 30px;
+        cursor: pointer;
+        margin-top: 20px;
+        font-size: 14px;
+        transition: all 0.2s;
+      }
+      .logout-btn:hover {
+        background: #ff6b6b;
+        color: white;
+      }
+      .empty-orders {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+      }
+      .empty-orders a {
+        color: #ff9f8c;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo" onclick="location.href = 'index.html'">🍰 Sweeter</div>
+      <nav>
+        <a href="index.html">Главная</a>
+        <a href="catalog.html">Каталог</a>
+        <a href="order.html">Заказ</a>
+        <a href="chat.html">Чат</a>
+        <a href="profile.html">👤 Профиль</a>
+        <div class="cart-icon" onclick="toggleCart()">
+          🛒 <span id="cart-count" class="cart-count">0</span>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Модальное окно корзины -->
+    <div id="cart-modal" class="cart-modal">
+      <h3>🛒 Корзина</h3>
+      <div class="cart-header">
+        <span>Количество</span>
+        <span>Товар</span>
+        <span></span>
+      </div>
+      <div id="cart-items" class="cart-items">Корзина пуста</div>
+      <div class="cart-total">
+        <span>Итого:</span>
+        <span id="cart-total">0</span>
+        <span>₽</span>
+      </div>
+      <button
+        class="btn cart-checkout-btn"
+        onclick="location.href = 'order.html'"
+      >
+        Оформить заказ
+      </button>
+    </div>
+
+    <main>
+      <div class="profile-container" id="profile-container">
+        <!-- Содержимое загружается через JS -->
+      </div>
+    </main>
+
+    <footer>
+      <p>© 2026 Sweeter — Вкусные моменты с доставкой</p>
+      <p>📞 +7 (***) ***-**-** | 📧 ***@sweeter.ru</p>
+      <p>📱 VK (скоро) | 💬 Telegram (скоро)</p>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+      function loadProfile() {
+        const currentUser = getCurrentUser();
+        const container = document.getElementById("profile-container");
+
+        if (!currentUser) {
+          container.innerHTML = `
+                    <div class="profile-card" style="text-align: center;">
+                        <h2>🔐 Требуется авторизация</h2>
+                        <p>Чтобы просмотреть профиль, пожалуйста, войдите в аккаунт.</p>
+                        <button class="btn" style="margin-top: 20px;" onclick="location.href='login.html'">Войти</button>
+                    </div>
+                `;
+          return;
+        }
+
+        // Получаем заказы пользователя по email или телефону
+        const allOrders = JSON.parse(
+          localStorage.getItem("sweeter_orders") || "[]",
+        );
+        const userOrders = allOrders.filter(
+          (order) =>
+            order.email === currentUser.email ||
+            order.phone === currentUser.phone,
+        );
+        userOrders.sort((a, b) => b.id - a.id);
+
+        function getStatusText(status) {
+          switch (status) {
+            case "Новый":
+              return "🆕 Новый";
+            case "Готовится":
+              return "👩‍🍳 Готовится";
+            case "Доставляется":
+              return "🚚 Доставляется";
+            case "Выполнен":
+              return "✅ Выполнен";
+            default:
+              return status;
+          }
+        }
+
+        function getStatusClass(status) {
+          switch (status) {
+            case "Новый":
+              return "status-new";
+            case "Готовится":
+              return "status-cooking";
+            case "Доставляется":
+              return "status-delivery";
+            case "Выполнен":
+              return "status-done";
+            default:
+              return "";
+          }
+        }
+
+        const ordersHtml =
+          userOrders.length === 0
+            ? '<div class="empty-orders">📭 У вас пока нет заказов. Перейдите в <a href="catalog.html">каталог</a>, чтобы сделать первый заказ!</div>'
+            : userOrders
+                .map(
+                  (order) => `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <span class="order-number">Заказ #${order.id}</span>
+                                <span class="order-date"> | ${order.date}</span>
+                            </div>
+                            <span class="order-status ${getStatusClass(order.status)}">${getStatusText(order.status)}</span>
+                        </div>
+                        <div class="order-items">
+                            <strong>🍰 Состав:</strong> ${order.items.map((i) => `${i.name} x${i.quantity}`).join(", ")}
+                        </div>
+                        <div class="order-total">
+                            Сумма: ${order.total} ₽
+                        </div>
+                        <div class="order-address">
+                            📍 ${order.address} | 📞 ${order.phone}
+                            ${order.comment ? `<br>💬 ${order.comment}` : ""}
+                        </div>
+                    </div>
+                `,
+                )
+                .join("");
+
+        container.innerHTML = `
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar">${getAvatar(currentUser.name)}</div>
+                        <div class="profile-info">
+                            <h2>${escapeHtml(currentUser.name)}</h2>
+                            <p>${currentUser.email}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">📞 Телефон</div>
+                        <div class="info-value">${currentUser.phone || "Не указан"}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">📧 Email</div>
+                        <div class="info-value">${currentUser.email}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">📅 Дата регистрации</div>
+                        <div class="info-value">${currentUser.createdAt || "—"}</div>
+                    </div>
+                    
+                    <button class="logout-btn" onclick="logout()">🚪 Выйти из аккаунта</button>
+                </div>
+                
+                <div class="profile-card">
+                    <div class="orders-title">📦 Мои заказы</div>
+                    ${ordersHtml}
+                </div>
+            `;
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        updateCartUI();
+        loadProfile();
+      });
+    </script>
+  </body>
+</html>

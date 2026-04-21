@@ -122,9 +122,13 @@ nav a:hover {
 
 /* === ГЕРОЙ-БЛОК === */
 .hero {
-  background: linear-gradient(135deg, #ff9f8c, #ffd4c4);
+  background:
+    linear-gradient(135deg, rgba(255, 159, 140, 0.6), rgba(255, 212, 196, 0.7)),
+    url("images/hero-bg.webp");
+  background-size: cover;
+  background-position: center;
   text-align: center;
-  padding: 80px 20px;
+  padding: 100px 20px;
   color: white;
 }
 
